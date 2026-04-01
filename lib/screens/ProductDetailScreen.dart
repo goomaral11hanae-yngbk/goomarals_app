@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
+
 import '../constants.dart';
-import '../widgets/custombutton.dart';
+import '../models/shop_product.dart';
+import '../widgets/CustomButton.dart';
 
 class ProductDetailScreen extends StatefulWidget {
-  final String name;
-  final String imageUrl;
-  final double price;
-  final String? description;
-
   const ProductDetailScreen({
     super.key,
-    required this.name,
-    required this.imageUrl,
-    required this.price,
-    this.description,
+    required this.product,
+    required this.isFavorite,
+    required this.onToggleFavorite,
+    required this.onAddToCart,
   });
+
+  final ShopProduct product;
+  final bool isFavorite;
+  final VoidCallback onToggleFavorite;
+  final ValueChanged<int> onAddToCart;
 
   @override
   State<ProductDetailScreen> createState() => _ProductDetailScreenState();
@@ -24,12 +26,19 @@ class ProductDetailScreen extends StatefulWidget {
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
   int _selectedSize = 18;
   int _quantity = 1;
-  bool _isFavorite = false;
+  late bool _isFavorite;
+
+  @override
+  void initState() {
+    super.initState();
+    _isFavorite = widget.isFavorite;
+  }
 
   void _addToCart() {
+    widget.onAddToCart(_quantity);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('${widget.name} сагсанд нэмэгдлээ!'),
+        content: Text('${widget.product.name} added to your cart.'),
         backgroundColor: AppConstants.primaryColor,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
@@ -41,13 +50,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   void _toggleFavorite() {
     setState(() => _isFavorite = !_isFavorite);
+    widget.onToggleFavorite();
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
           _isFavorite
-              ? 'Хүслийн жагсаалтанд нэмэгдлээ!'
-              : 'Хүслийн жагсаалтаас хасагдлаа!',
+              ? '${widget.product.name} saved to wishlist.'
+              : '${widget.product.name} removed from wishlist.',
         ),
         backgroundColor: _isFavorite ? Colors.pink : Colors.grey,
         behavior: SnackBarBehavior.floating,
@@ -65,7 +75,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            /// HEADER
             Padding(
               padding: const EdgeInsets.all(16),
               child: Row(
@@ -80,7 +89,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       duration: const Duration(milliseconds: 300),
                       child: Icon(
                         _isFavorite ? Iconsax.heart5 : Iconsax.heart,
-                        key: ValueKey(_isFavorite),
+                        key: ValueKey<bool>(_isFavorite),
                         color: _isFavorite ? Colors.pink : Colors.black,
                       ),
                     ),
@@ -89,24 +98,21 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 ],
               ),
             ),
-
-            /// BODY
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    /// IMAGE
                     Hero(
-                      tag: widget.imageUrl,
+                      tag: widget.product.imageUrl,
                       child: Container(
                         height: 320,
                         width: double.infinity,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(22),
                           image: DecorationImage(
-                            image:AssetImage(widget.imageUrl),
+                            image: AssetImage(widget.product.imageUrl),
                             fit: BoxFit.cover,
                           ),
                         ),
@@ -117,8 +123,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               begin: Alignment.topCenter,
                               end: Alignment.bottomCenter,
                               colors: [
-                                Colors.black.withOpacity(0.05),
-                                Colors.black.withOpacity(0.35),
+                                Colors.black.withValues(alpha: 0.05),
+                                Colors.black.withValues(alpha: 0.35),
                               ],
                             ),
                           ),
@@ -127,21 +133,27 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             child: Container(
                               margin: const EdgeInsets.all(12),
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 6),
+                                horizontal: 10,
+                                vertical: 6,
+                              ),
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(10),
                               ),
-                              child: const Row(
+                              child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(Iconsax.star1,
-                                      color: Colors.amber, size: 16),
-                                  SizedBox(width: 4),
+                                  const Icon(
+                                    Iconsax.star1,
+                                    color: Colors.amber,
+                                    size: 16,
+                                  ),
+                                  const SizedBox(width: 4),
                                   Text(
-                                    '4.8',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
+                                    widget.product.rating.toStringAsFixed(1),
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -150,16 +162,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         ),
                       ),
                     ),
-
                     const SizedBox(height: 24),
-
-                    /// NAME + PRICE
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Expanded(
                           child: Text(
-                            widget.name,
+                            widget.product.name,
                             style: const TextStyle(
                               fontSize: 26,
                               fontWeight: FontWeight.bold,
@@ -167,7 +176,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           ),
                         ),
                         Text(
-                          '\$${widget.price.toStringAsFixed(2)}',
+                          '\$${widget.product.price.toStringAsFixed(2)}',
                           style: const TextStyle(
                             fontSize: 26,
                             fontWeight: FontWeight.bold,
@@ -176,40 +185,34 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         ),
                       ],
                     ),
-
                     const SizedBox(height: 16),
-
-                    /// DESCRIPTION
                     Text(
-                      widget.description ??
-                          'Өндөр чанартай материал, гараар хийсэн нарийн хийцтэй тансаг гоёл.',
+                      widget.product.description,
                       style: const TextStyle(
                         fontSize: 16,
                         height: 1.6,
                         color: Colors.black54,
                       ),
                     ),
-
                     const SizedBox(height: 28),
-
-                    /// SIZE
                     const Text(
-                      'Хэмжээ',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                      'Size',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                     ),
                     const SizedBox(height: 12),
-                    Row(
+                    Wrap(
+                      spacing: 12,
+                      runSpacing: 12,
                       children: [16, 17, 18, 19, 20].map((size) {
                         final selected = _selectedSize == size;
                         return GestureDetector(
-                          onTap: () =>
-                              setState(() => _selectedSize = size),
+                          onTap: () => setState(() => _selectedSize = size),
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 250),
-                            margin: const EdgeInsets.only(right: 12),
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 12),
+                              horizontal: 20,
+                              vertical: 12,
+                            ),
                             decoration: BoxDecoration(
                               color: selected
                                   ? AppConstants.primaryColor
@@ -219,7 +222,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                   ? [
                                       BoxShadow(
                                         color: AppConstants.primaryColor
-                                            .withOpacity(0.4),
+                                            .withValues(alpha: 0.4),
                                         blurRadius: 8,
                                         offset: const Offset(0, 4),
                                       ),
@@ -230,22 +233,17 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               size.toString(),
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
-                                color:
-                                    selected ? Colors.white : Colors.black87,
+                                color: selected ? Colors.white : Colors.black87,
                               ),
                             ),
                           ),
                         );
                       }).toList(),
                     ),
-
                     const SizedBox(height: 28),
-
-                    /// QUANTITY
                     const Text(
-                      'Тоо хэмжээ',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                      'Quantity',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                     ),
                     const SizedBox(height: 12),
                     Container(
@@ -255,7 +253,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         borderRadius: BorderRadius.circular(14),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
+                            color: Colors.black.withValues(alpha: 0.05),
                             blurRadius: 8,
                           ),
                         ],
@@ -285,27 +283,62 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         ],
                       ),
                     ),
-
                     const SizedBox(height: 28),
-
-                    _detailItem(Iconsax.star, 'Материал', '24К Алт'),
-                    _detailItem(Iconsax.weight, 'Жин', '2.5 грамм'),
-                    _detailItem(Iconsax.shield_tick, 'Баталгаа', '2 жил'),
-
+                    _detailItem(Iconsax.star, 'Material', widget.product.material),
+                    _detailItem(Iconsax.weight, 'Weight', widget.product.weight),
+                    _detailItem(
+                      Iconsax.shield_tick,
+                      'Reviews',
+                      '${widget.product.reviewCount}+ verified',
+                    ),
+                    const SizedBox(height: 18),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    'Styling tips for ${widget.product.name} are on the way.',
+                                  ),
+                                ),
+                              );
+                            },
+                            icon: const Icon(Icons.auto_awesome_outlined),
+                            label: const Text('Style tips'),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    'A gift note was prepared for ${widget.product.name}.',
+                                  ),
+                                ),
+                              );
+                            },
+                            icon: const Icon(Icons.card_giftcard),
+                            label: const Text('Gift option'),
+                          ),
+                        ),
+                      ],
+                    ),
                     const SizedBox(height: 40),
                   ],
                 ),
               ),
             ),
-
-            /// ADD TO CART
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: Colors.white,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 12,
                     offset: const Offset(0, -2),
                   ),
@@ -313,7 +346,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               ),
               child: CustomButton(
                 text:
-                    'Сагсанд нэмэх • \$${(widget.price * _quantity).toStringAsFixed(2)}',
+                    'Add to cart • \$${(widget.product.price * _quantity).toStringAsFixed(2)}',
                 backgroundColor: AppConstants.primaryColor,
                 onPressed: _addToCart,
               ),
@@ -330,7 +363,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     required VoidCallback onTap,
   }) {
     return CircleAvatar(
-      backgroundColor: Colors.black.withOpacity(0.08),
+      backgroundColor: Colors.black.withValues(alpha: 0.08),
       child: IconButton(
         icon: iconWidget ?? Icon(icon, color: Colors.black),
         onPressed: onTap,
@@ -347,7 +380,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -360,8 +393,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           Expanded(
             child: Text(
               title,
-              style:
-                  const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
             ),
           ),
           Text(

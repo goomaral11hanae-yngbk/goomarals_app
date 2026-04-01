@@ -20,7 +20,7 @@ class LoginScreen extends StatelessWidget {
 
           
           Container(
-            color: Colors.black.withOpacity(0.3),
+            color: Colors.black.withValues(alpha: 0.3),
           ),
 
         
@@ -40,7 +40,7 @@ class LoginScreen extends StatelessWidget {
                       shadows: [
                         Shadow(
                           blurRadius: 10,
-                          color: Colors.black.withOpacity(0.7),
+                          color: Colors.black.withValues(alpha: 0.7),
                           offset: const Offset(2, 2),
                         )
                       ],
@@ -102,7 +102,7 @@ class LoginScreen extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(14),
-        color: Colors.white.withOpacity(0.85),
+        color: Colors.white.withValues(alpha: 0.85),
       ),
       child: TextField(
         obscureText: obscure,
