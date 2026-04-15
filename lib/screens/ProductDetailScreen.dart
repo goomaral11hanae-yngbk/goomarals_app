@@ -346,7 +346,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               ),
               child: CustomButton(
                 text:
-                    'Add to cart • \$${(widget.product.price * _quantity).toStringAsFixed(2)}',
+                    'Add to cart â€¢ \$${(widget.product.price * _quantity).toStringAsFixed(2)}',
                 backgroundColor: AppConstants.primaryColor,
                 onPressed: _addToCart,
               ),

@@ -9,7 +9,7 @@ class LoginScreen extends StatelessWidget {
       body: Stack(
         children: [
           Image.asset('assets/images/SW_bracelet.jpg',),
-          // 🔹 BACKGROUND IMAGE
+          // ðŸ”¹ BACKGROUND IMAGE
           Positioned.fill(
             child: Image.asset(
               'assets/images/D_bracelet.jpg',

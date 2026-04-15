@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/shop_product.dart';
+import 'PaymentOptionsScreen.dart';
 
 class CartSummaryScreen extends StatelessWidget {
   const CartSummaryScreen({
@@ -113,8 +114,14 @@ class CartSummaryScreen extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Checkout flow coming next.')),
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => PaymentOptionsScreen(
+                          total: total,
+                          itemCount: cartItems.length,
+                        ),
+                      ),
                     );
                   },
                   style: ElevatedButton.styleFrom(

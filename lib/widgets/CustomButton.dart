@@ -7,7 +7,7 @@ class CustomButton extends StatelessWidget {
   final Color textColor;
   final double borderRadius;
   final double elevation;
-  final double? height; // ✅ нэмэгдсэн
+  final double? height; // âœ… Ð½ÑÐ¼ÑÐ³Ð´ÑÑÐ½
 
   const CustomButton({
     super.key,

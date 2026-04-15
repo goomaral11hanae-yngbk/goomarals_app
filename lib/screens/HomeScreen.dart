@@ -46,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
             .toList();
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0F0F0F),
+      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       body: Column(
         children: [
           Padding(
@@ -60,7 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     Text(
                       'Holiday Collection',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: Color(0xFF1A1A1A),
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                       ),
@@ -68,7 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     SizedBox(height: 4),
                     Text(
                       'Find your next signature piece',
-                      style: TextStyle(color: Colors.white70),
+                      style: TextStyle(color: Color(0xFF666666)),
                     ),
                   ],
                 ),
@@ -202,14 +202,16 @@ class _HomeScreenState extends State<HomeScreen> {
                           decoration: BoxDecoration(
                             color: selected
                                 ? const Color(0xFFB08D57)
-                                : Colors.white.withValues(alpha: 0.12),
+                                : const Color(0xFFF3F3F3),
                             borderRadius: BorderRadius.circular(30),
                           ),
                           child: Center(
                             child: Text(
                               cat,
                               style: TextStyle(
-                                color: selected ? Colors.black : Colors.white70,
+                                color: selected
+                                    ? Colors.black
+                                    : const Color(0xFF555555),
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -228,7 +230,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       const Text(
                         'Popular pieces',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: Color(0xFF1A1A1A),
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
@@ -402,9 +404,9 @@ class _HomeScreenState extends State<HomeScreen> {
       child: IconButton.filledTonal(
         onPressed: onTap,
         style: IconButton.styleFrom(
-          backgroundColor: Colors.white.withValues(alpha: 0.12),
+          backgroundColor: const Color(0xFFF3F3F3),
         ),
-        icon: Icon(icon, color: Colors.white),
+        icon: Icon(icon, color: const Color(0xFF1A1A1A)),
       ),
     );
   }
